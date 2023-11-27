@@ -2,15 +2,25 @@
 import { Game } from "./Game.js"
 
 
-let app = new PIXI.Application({
-    "antialias": false,
-    "height": 560,
-    "width": 1024,
-    "backgroundColor": "#2f237f"
-});
+const app = {
+    renderer: new PIXI.Renderer({
+        "antialias": false,
+        "height": 480,
+        "width": 720,
+        "backgroundColor": "#2f237f"
+    }),
+    stage: new PIXI.Container()
+};
 let game = new Game(app);
+window.onload = () => {
+    let ctx = app.renderer.view.getContext('2d') as CanvasRenderingContext2D;
+    ctx.rect(38,104,30,30);
+    ctx.strokeStyle = "black";
+    ctx.fill();
+}
 
 (globalThis as any).game = game;
-(globalThis as any).__PIXI_APP__ = app;
-document.body.appendChild(app.view as HTMLCanvasElement);
+(globalThis as any).__PIXI_STAGE__ = app.stage;
+(globalThis as any).__PIXI_RENDERER__ = app.renderer;
+document.body.appendChild(app.renderer.view as HTMLCanvasElement);
 game.Init(true);

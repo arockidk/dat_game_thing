@@ -1,3 +1,7 @@
+export interface Vec2 {
+    x: number;
+    y: number;
+}
 export class Vector2 {
     public x: number;
     public y: number;
@@ -9,6 +13,9 @@ export class Vector2 {
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
+    }
+    public static from(v: Vec2): Vector2 {
+        return new this(v.x,v.y);
     }
     public get magnitude(): number {
         return Math.sqrt(this.x * this.x + this.y * this.y)

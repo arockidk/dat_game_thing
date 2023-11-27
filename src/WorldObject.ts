@@ -7,7 +7,7 @@ import { World } from "./World.js";
 export class WorldObject extends Instance {
     protected _position: Vector2;
     protected _hitbox: Hitbox;
-    protected _pixiObject: PIXI.Container;
+    protected _pixi_object: PIXI.Container;
     protected _rotation: number;
     protected _velocity: Vector2;
     protected _canCollide: boolean;
@@ -17,15 +17,16 @@ export class WorldObject extends Instance {
     protected _y_remainder: number = 0;
     
     public readonly className: string = "WorldObject";
-    public constructor(pixiObject: PIXI.Container, world?: World, position: Vector2 = Vector2.ZERO, rotation: number = 0, hitbox: Hitbox = new Hitbox(0, 0, Vector2.ZERO), parent?: Instance) {
+    public constructor(pixi_object: PIXI.Container, world?: World, position: Vector2 = Vector2.ZERO, rotation: number = 0, hitbox: Hitbox = new Hitbox(0, 0, Vector2.ZERO), parent?: Instance) {
         super(parent, world)
         
         this._position = position;
         this._rotation = rotation;
         this._hitbox = hitbox;
-        pixiObject.position = position;
-        pixiObject.angle = rotation;
-        this._pixiObject = pixiObject;
+        pixi_object.position = position;
+        pixi_object.angle = rotation;
+        
+        this._pixi_object = pixi_object;
         
         this._velocity = Vector2.ZERO;
         this._canCollide = true;
@@ -48,18 +49,15 @@ export class WorldObject extends Instance {
     public get position(): Vector2 { return this._position; }
     public set position(v2: Vector2) {
         this._position = v2; 
-        this._pixiObject.position = this._position;
+        this._pixi_object.position = this._position;
         this._hitbox.calcuateBounds(
-            this._position.add(new Vector2(
-                this._hitbox._rect.getWidth()/2,
-                this._hitbox._rect.getHeight()/2
-            )).add(this._hitboxOffset)
+            this._position.add(this._hitboxOffset)
         );
     }
     public get rotation(): number { return this._rotation; }
     public set rotation(value: number) { 
         this._rotation = value;
-        this._pixiObject.angle = this._rotation;
+        this._pixi_object.angle = this._rotation;
     }
     public get velocity(): Vector2 { return this._velocity; }
 
@@ -68,11 +66,11 @@ export class WorldObject extends Instance {
 
     }
     public getHitbox(): Hitbox { return this._hitbox; }
-    public setHitbox(value: Hitbox): WorldObject { this._hitbox = value; return this; }
-    public getPixiObject(): PIXI.Container { return this._pixiObject; }
-    public setPixiObject(value: PIXI.Container): WorldObject { this._pixiObject = value; return this;}
+    public setHitbox(value: Hitbox) { this._hitbox = value; }
+    public get pixi_object(): PIXI.Container { return this._pixi_object; }
+    public set pixi_object(value: PIXI.Container) { this._pixi_object = value;}
     public getHitboxOffset(): Vector2 { return this._hitboxOffset; }
-    public setHitboxOffset(value: Vector2): WorldObject { this._hitboxOffset = value; return this;}
+    public setHitboxOffset(value: Vector2) { this._hitboxOffset = value;}
     public collidesWith(position: Vector2): boolean
     public collidesWith(hitbox: Hitbox): boolean
     public collidesWith(other: WorldObject): boolean
@@ -90,7 +88,7 @@ export class WorldObject extends Instance {
     
     public set parent(value: Instance) {
         if (this._parent instanceof WorldObject) {
-            this._parent["_pixiObject"].removeChild(this._pixiObject);
+            this._parent["_pixi_object"].removeChild(this._pixi_object);
 
         }
 
@@ -100,7 +98,7 @@ export class WorldObject extends Instance {
         this._parent = value;
         value["_children"].push(this);
         if (value instanceof WorldObject) {
-            value._pixiObject.addChild(this._pixiObject); 
+            value._pixi_object.addChild(this._pixi_object); 
 
         }
     }

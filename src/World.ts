@@ -11,6 +11,7 @@ export class World extends WorldObject {
         for (const object of this.getChildren()) {
             if (param == object) continue;
             if (object instanceof WorldObject) {
+                
                 if (object.collidesWith(param)) {return true};
             }
         }

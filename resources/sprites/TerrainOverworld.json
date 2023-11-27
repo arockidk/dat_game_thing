@@ -1,0 +1,85 @@
+{
+    "frames": {
+        "grass_tile": {
+            "frame": {
+                "x": 0,
+                "y": 0,
+                "w": 32,
+                "h": 32
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 32,
+                "h": 32
+            }
+        },
+        "dirt_tile": {
+            "frame": {
+                "x": 32,
+                "y": 0,
+                "w": 32,
+                "h": 32
+            },
+            "sourceSize": {
+                "w": 32,
+                "h": 32
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 32,
+                "h": 32
+            }
+        },
+        "multi_a": {
+            "frame": {
+                "x": 64,
+                "y": 0,
+                "w": 8,
+                "h": 8
+            },
+            "sourceSize": {
+                "w": 8,
+                "h": 8
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 8,
+                "h": 8
+            }
+        },
+        "multi_b": {
+            "frame": {
+                "x": 72,
+                "y": 0,
+                "w": 8,
+                "h": 8
+            },
+            "sourceSize": {
+                "w": 8,
+                "h": 8
+            },
+            "spriteSourceSize": {
+                "x": 0,
+                "y": 0,
+                "w": 8,
+                "h": 8
+            }
+        }
+    },
+    "meta": {
+        "image": "TerrainOverworld.png",
+        "format": "RGBA8888",
+        "size": {
+            "w": 32,
+            "h": 32
+        },
+        "scale": 1
+    }
+}

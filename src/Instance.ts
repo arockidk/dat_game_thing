@@ -16,7 +16,7 @@ export default class Instance {
     public get world(): World | undefined {
         return this._world;
     }
-    public set world(v: World) {
+    public set world(v: World | undefined) {
         this._world = v;
     }
     

@@ -1,0 +1,30 @@
+{
+    "overworld": {
+        "tiles": {
+            "grass_tile": {
+                "name": "grass_tile",
+                "size": {
+                    "x": 32,
+                    "y": 32
+                }
+            }
+        },
+        "quads": {
+            "test_quad": {
+                "name": "test_quad",
+                "textures": [
+                    "multi_b", 
+                    "multi_b", 
+                    "multi_b", 
+                    "multi_b", 
+                    "mutli_a", 
+                    "mutli_a", 
+                    "mutli_a", 
+                    "mutli_a",
+                    "multi_a"
+                ]
+            }
+        }
+        
+    }
+}

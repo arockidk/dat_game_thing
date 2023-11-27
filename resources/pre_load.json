@@ -1,1 +1,7 @@
-[]
+[
+    {
+        "id": "terrain",
+        "path": "/resources/terrain.json",
+        "type": "JSON"
+    }
+]
