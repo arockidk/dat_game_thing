@@ -4,11 +4,7 @@
     }
 </style>
 <script> 
-let oldfetch = window.fetch;
-window.fetch = function(url, options) {
-    return oldfetch('/dat_game_thing/' + url, options);
 
-}
 </script>
 <script src="/dat_game_thing/dist/main.js" type="module"></script>
 <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
