@@ -96,14 +96,10 @@ export class Game {
         this._scene = new World(new PIXI.Container());
         UserInputService.Initialize();
         
-        this.Load(await this.LoadJSON<{    
-            path: string,
-            load_type: LoadType,
-            id: string
-        }[]>('/dat_game_thing/resources/pre_load.json'), this.Run.bind(this));
+        this.Run();
     }
 
-    public async Run(loaded: Map<string,any>): Promise<void> {
+    public async Run(loaded?: Map<string,any>): Promise<void> {
         console.log("EE")
         // #region Sprite setup
         let player_sheet: PIXI.Spritesheet = await PIXI.Assets.load('dat_game_thing/resources/sprites/Cat.json');
