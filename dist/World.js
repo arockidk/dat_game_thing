@@ -1,3 +1,4 @@
+import Collectible from "./Collectible.js";
 import { WorldObject } from "./WorldObject.js";
 export class World extends WorldObject {
     className = "World";
@@ -7,9 +8,10 @@ export class World extends WorldObject {
             if (param == object)
                 continue;
             if (object instanceof WorldObject) {
-                if (object.collidesWith(param)) {
-                    return true;
-                }
+                if (object.canCollide)
+                    if (object.collidesWith(param)) {
+                        return true;
+                    }
                 ;
             }
         }
@@ -21,9 +23,27 @@ export class World extends WorldObject {
             if (obj == object)
                 continue;
             if (object instanceof WorldObject) {
-                if (obj.collidesWith(object)) {
-                    objects.push(object);
+                if (object.canCollide)
+                    if (obj.collidesWith(object)) {
+                        objects.push(object);
+                    }
+                ;
+            }
+        }
+        return objects;
+    }
+    getTouchingObjects(obj) {
+        let objects = [];
+        for (const object of this.getChildren()) {
+            if (obj == object)
+                continue;
+            if (object instanceof WorldObject) {
+                if (object instanceof Collectible) {
                 }
+                if (object.canTouch)
+                    if (obj.collidesWith(object)) {
+                        objects.push(object);
+                    }
                 ;
             }
         }

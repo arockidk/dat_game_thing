@@ -20,7 +20,7 @@ export class Vector2 {
     public get magnitude(): number {
         return Math.sqrt(this.x * this.x + this.y * this.y)
     }
-    public get normal(): Vector2 { 
+    public normal(): Vector2 { 
         return (new Vector2(this.x, this.y)).div(this.magnitude);
     } 
     public add(v: Vector2): Vector2 {

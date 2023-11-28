@@ -1,4 +1,5 @@
 import Actor from "./Actor.js";
+import Jumpable from "./Jumpable.js";
 import { float, int } from "./typedef.js";
 enum PLAYER_STATE { 
     IDLE,
@@ -7,7 +8,8 @@ enum PLAYER_STATE {
 }
 
 
-export class Player extends Actor {
+export class Player extends Actor implements Jumpable {
+    public airtime: number = 0;
     public className: string = "Player";
     protected _speed: number = 2;
     protected _state: PLAYER_STATE = PLAYER_STATE.IDLE;

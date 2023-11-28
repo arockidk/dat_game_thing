@@ -16,6 +16,10 @@ export class WorldObject extends Instance {
     protected _x_remainder: number = 0;
     protected _y_remainder: number = 0;
     
+    private _canTouch : boolean = false;
+
+    
+    
     public readonly className: string = "WorldObject";
     public constructor(pixi_object: PIXI.Container, world?: World, position: Vector2 = Vector2.ZERO, rotation: number = 0, hitbox: Hitbox = new Hitbox(0, 0, Vector2.ZERO), parent?: Instance) {
         super(parent, world)
@@ -23,6 +27,7 @@ export class WorldObject extends Instance {
         this._position = position;
         this._rotation = rotation;
         this._hitbox = hitbox;
+        
         pixi_object.position = position;
         pixi_object.angle = rotation;
         
@@ -30,6 +35,7 @@ export class WorldObject extends Instance {
         
         this._velocity = Vector2.ZERO;
         this._canCollide = true;
+        this._canTouch = true;
         this._hitboxOffset = Vector2.ZERO
         this._anchored = false;
     }
@@ -39,6 +45,12 @@ export class WorldObject extends Instance {
     }
     public set canCollide(value: boolean) {
         this._canCollide = value;
+    }
+    public get canTouch() : boolean {
+        return this._canTouch;
+    }
+    public set canTouch(v : boolean) {
+        this._canTouch = v;
     }
     public get anchored(): boolean {
         return this._anchored;
@@ -96,11 +108,19 @@ export class WorldObject extends Instance {
             this._parent["_children"].splice(this._parent["_children"].indexOf(this),1)
         }
         this._parent = value;
-        value["_children"].push(this);
+        if (value) {
+            value["_children"].push(this);
+        }
         if (value instanceof WorldObject) {
             value._pixi_object.addChild(this._pixi_object); 
 
         }
+    }
+    public override destroy(): void {
+        super.destroy();
+        this._pixi_object.destroy();  
+        
+        
     }
     
 }

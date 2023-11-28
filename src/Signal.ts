@@ -28,7 +28,11 @@ export class Signal<FunctionSignature extends (...args:any) =>any> {
     // }
     public Fire(...args:Parameters<FunctionSignature>): void{
         for (let connection of Object.values(this.Connections)) { 
+            // console.log(connection);
             connection.Callback(args)
         }
+    }
+    public get connections(): Connections {
+        return this.Connections;
     }
 }

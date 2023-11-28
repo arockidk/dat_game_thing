@@ -15,10 +15,13 @@ export class Vector2 {
         this.x = x;
         this.y = y;
     }
+    static from(v) {
+        return new this(v.x, v.y);
+    }
     get magnitude() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
-    get normal() {
+    normal() {
         return (new Vector2(this.x, this.y)).div(this.magnitude);
     }
     add(v) {

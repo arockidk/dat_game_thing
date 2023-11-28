@@ -4,7 +4,7 @@ import { Vector2 } from "./Vector2.js";
 export class WorldObject extends Instance {
     _position;
     _hitbox;
-    _pixiObject;
+    _pixi_object;
     _rotation;
     _velocity;
     _canCollide;
@@ -12,17 +12,19 @@ export class WorldObject extends Instance {
     _anchored;
     _x_remainder = 0;
     _y_remainder = 0;
+    _canTouch = false;
     className = "WorldObject";
-    constructor(pixiObject, world, position = Vector2.ZERO, rotation = 0, hitbox = new Hitbox(0, 0, Vector2.ZERO), parent) {
+    constructor(pixi_object, world, position = Vector2.ZERO, rotation = 0, hitbox = new Hitbox(0, 0, Vector2.ZERO), parent) {
         super(parent, world);
         this._position = position;
         this._rotation = rotation;
         this._hitbox = hitbox;
-        pixiObject.position = position;
-        pixiObject.angle = rotation;
-        this._pixiObject = pixiObject;
+        pixi_object.position = position;
+        pixi_object.angle = rotation;
+        this._pixi_object = pixi_object;
         this._velocity = Vector2.ZERO;
         this._canCollide = true;
+        this._canTouch = true;
         this._hitboxOffset = Vector2.ZERO;
         this._anchored = false;
     }
@@ -31,6 +33,12 @@ export class WorldObject extends Instance {
     }
     set canCollide(value) {
         this._canCollide = value;
+    }
+    get canTouch() {
+        return this._canTouch;
+    }
+    set canTouch(v) {
+        this._canTouch = v;
     }
     get anchored() {
         return this._anchored;
@@ -41,24 +49,24 @@ export class WorldObject extends Instance {
     get position() { return this._position; }
     set position(v2) {
         this._position = v2;
-        this._pixiObject.position = this._position;
-        this._hitbox.calcuateBounds(this._position.add(new Vector2(this._hitbox._rect.getWidth() / 2, this._hitbox._rect.getHeight() / 2)).add(this._hitboxOffset));
+        this._pixi_object.position = this._position;
+        this._hitbox.calcuateBounds(this._position.add(this._hitboxOffset));
     }
     get rotation() { return this._rotation; }
     set rotation(value) {
         this._rotation = value;
-        this._pixiObject.angle = this._rotation;
+        this._pixi_object.angle = this._rotation;
     }
     get velocity() { return this._velocity; }
     set velocity(v2) {
         this._velocity = v2;
     }
     getHitbox() { return this._hitbox; }
-    setHitbox(value) { this._hitbox = value; return this; }
-    getPixiObject() { return this._pixiObject; }
-    setPixiObject(value) { this._pixiObject = value; return this; }
+    setHitbox(value) { this._hitbox = value; }
+    get pixi_object() { return this._pixi_object; }
+    set pixi_object(value) { this._pixi_object = value; }
     getHitboxOffset() { return this._hitboxOffset; }
-    setHitboxOffset(value) { this._hitboxOffset = value; return this; }
+    setHitboxOffset(value) { this._hitboxOffset = value; }
     collidesWith(other) {
         // console.log(other)
         if (other instanceof Vector2) {
@@ -73,16 +81,22 @@ export class WorldObject extends Instance {
     }
     set parent(value) {
         if (this._parent instanceof WorldObject) {
-            this._parent["_pixiObject"].removeChild(this._pixiObject);
+            this._parent["_pixi_object"].removeChild(this._pixi_object);
         }
         if (this._parent) {
             this._parent["_children"].splice(this._parent["_children"].indexOf(this), 1);
         }
         this._parent = value;
-        value["_children"].push(this);
-        if (value instanceof WorldObject) {
-            value._pixiObject.addChild(this._pixiObject);
+        if (value) {
+            value["_children"].push(this);
         }
+        if (value instanceof WorldObject) {
+            value._pixi_object.addChild(this._pixi_object);
+        }
+    }
+    destroy() {
+        super.destroy();
+        this._pixi_object.destroy();
     }
 }
 //# sourceMappingURL=WorldObject.js.map

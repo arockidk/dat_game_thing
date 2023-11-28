@@ -30,8 +30,12 @@ export class Signal {
     // }
     Fire(...args) {
         for (let connection of Object.values(this.Connections)) {
+            // console.log(connection);
             connection.Callback(args);
         }
+    }
+    get connections() {
+        return this.Connections;
     }
 }
 //# sourceMappingURL=Signal.js.map

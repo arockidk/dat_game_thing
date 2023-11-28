@@ -22,7 +22,7 @@ export default class Instance {
             this._parent._children.splice(this._parent._children.indexOf(this), 1);
         }
         this._parent = value;
-        if (value) {
+        if (value instanceof Instance) {
             value._children.push(this);
         }
     }
@@ -107,5 +107,12 @@ export default class Instance {
     }
     isA(cls) { return this instanceof cls; }
     ;
+    destroy() {
+        for (let child of this._children) {
+            child.destroy();
+        }
+        this.parent = undefined;
+        this.world = undefined;
+    }
 }
 //# sourceMappingURL=Instance.js.map

@@ -1,4 +1,5 @@
 
+import Collectible from "./Collectible.js";
 import { Vector2 } from "./Vector2.js";
 import { WorldObject } from "./WorldObject.js";
 
@@ -11,8 +12,8 @@ export class World extends WorldObject {
         for (const object of this.getChildren()) {
             if (param == object) continue;
             if (object instanceof WorldObject) {
+                if (object.canCollide) if (object.collidesWith(param)) {return true};
                 
-                if (object.collidesWith(param)) {return true};
             }
         }
         return false;
@@ -24,7 +25,23 @@ export class World extends WorldObject {
             
             if (obj == object) continue;
             if (object instanceof WorldObject) {
-                if (obj.collidesWith(object)) {objects.push(object);};
+                if (object.canCollide) if (obj.collidesWith(object)) {objects.push(object);};
+            }
+        }
+        return objects;
+    }
+    public getTouchingObjects(obj: WorldObject): WorldObject[] {
+        let objects: WorldObject[] = [];
+        for (const object of this.getChildren()) {
+            
+            
+            if (obj == object) continue;
+            if (object instanceof WorldObject) {
+                
+                if (object instanceof Collectible) { 
+                    
+                }
+                if (object.canTouch) if (obj.collidesWith(object)) {objects.push(object);};
             }
         }
         return objects;

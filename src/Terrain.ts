@@ -1,4 +1,6 @@
+import Quad from "./Quad.js";
 import { Vec2 } from "./Vector2.js";
+import { WorldObject } from "./WorldObject.js";
 
 
 interface TileData {
@@ -20,7 +22,7 @@ export interface LevelData {
     data: {
         terrain_type: 'tile' | 'quad';
         size: Vec2;
-        repeat: {
+        repeat?: {
             min: number;
             max: number;
             func: string;
@@ -33,6 +35,15 @@ export class TerrainFactory {
     public constructor(data: terrain_json) {
         this.data = data;
     }
-    public create_tile(name: string, size: Vec2) {}
+    // public createLevel(data: LevelData) {
+    //     for (let obj of data.data) {
+    //         if (obj.terrain_type === 'tile') { 
+                
+    //         }
+    //     }
+    // }
+    // public createTile(name: string, size: Vec2): WorldObject {}
+    // public createQuad(name: string, size: Vec2): Quad {}
 }
+
 

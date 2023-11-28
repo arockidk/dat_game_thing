@@ -1,8 +1,16 @@
+import Enemy from "./Enemy.js";
 import { Hitbox } from "./Hitbox.js";
 import { Player } from "./Player.js";
+import Quad from "./Quad.js";
+import Rat from "./Rat.js";
 import { UserInputService } from "./UserInputService.js";
 import { Vector2 } from "./Vector2.js";
 import { World } from "./World.js";
+import { WorldObject } from "./WorldObject.js";
+import { rand } from "./Random.js";
+import Collectible from "./Collectible.js";
+import Cheese from "./Cheese.js";
+import { multiplier } from "./expfn.js";
 var LoadType;
 (function (LoadType) {
     LoadType["JSON"] = "JSON";
@@ -12,12 +20,31 @@ var LoadType;
 ;
 export class Game {
     _app;
+    // private _cam: Camera;
+    _cam_x;
+    _cam_y;
     _scene;
     _player;
-    a;
+    _player_sheet;
+    _start;
+    _enemy_sheet;
+    _collectible_sheet;
+    points_text;
+    _break = false;
+    points;
     constructor(app) {
         this._app = app;
+        this._cam_x = 0;
+        this._cam_y = 0;
+        this.points = 0;
+        this.points_text = new PIXI.Text(this.points, {
+            fontFamily: 'Arial',
+            fontSize: 16,
+            fill: 0xffdd00,
+            align: 'left',
+        });
         console.log(this._app);
+        // this._cam = new Camera(Vector2.ZERO);
     }
     async LoadJSON(path) {
         return await (await fetch(path)).json();
@@ -59,45 +86,237 @@ export class Game {
         // #region Sprite setup
         let player_sheet = await PIXI.Assets.load('resources/sprites/Cat.json');
         await player_sheet.parse();
+        this._player_sheet = player_sheet;
+        let terrain_sheet = await PIXI.Assets.load('resources/sprites/TerrainOverworld.json');
+        await terrain_sheet.parse();
+        let enemy_sheet = await PIXI.Assets.load('resources/sprites/Rat.json');
+        await enemy_sheet.parse();
+        this._enemy_sheet = enemy_sheet;
+        let collectible_sheet = await PIXI.Assets.load('resources/sprites/Cheese.json');
+        await collectible_sheet.parse();
+        this._collectible_sheet = collectible_sheet;
         console.log(player_sheet);
         // #endregion
-        let player = new Player(new PIXI.Sprite(player_sheet['textures']['stand']), this._scene, new Vector2(0, 0), 0, new Hitbox(28, 24, new Vector2(4, 4)));
-        this._app.ticker.add(this.Update, this);
-        this._app.stage.addChild(this._scene.getPixiObject());
-        this._app.ticker.start();
+        let player = new Player(new PIXI.Sprite(player_sheet['textures']['stand']), this._scene, new Vector2(0, 0), 0, new Hitbox(24, 40, new Vector2(0, 0)));
+        player.setHitboxOffset(new Vector2(-16, -4));
+        this._app.stage.addChild(this._scene.pixi_object);
         player.parent = this._scene;
         this._player = player;
-        console.log(this._scene.getPixiObject());
+        console.log(this._scene.pixi_object);
         player.name = "Player";
+        for (let i = 0; i < 4; i++) {
+            let block = new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(40 + i * 32, 120), 0, new Hitbox(32, 32, new Vector2(40 + i * 32, 120)));
+            block.parent = this._scene;
+            console.log(block.pixi_object.anchor);
+        }
+        new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(240, 88), 0, new Hitbox(32, 32, new Vector2(240, 88)));
+        for (let i = 0; i < 12; i++) {
+            let block = new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(-30 + i * 32, 220), 0, new Hitbox(32, 32, new Vector2(-30 + i * 32, 220)));
+            block.parent = this._scene;
+        }
+        for (let i = 0; i < 7; i++) {
+            let block = new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(-400 + i * 32, 270), 0, new Hitbox(32, 32, new Vector2(-400 + i * 32, 270)));
+            block.parent = this._scene;
+        }
+        for (let i = 0; i < 2; i++) {
+            let block = new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(-120 + i * 32, 150), 0, new Hitbox(32, 32, new Vector2(-120 + i * 32, 150)));
+            block.parent = this._scene;
+        }
+        for (let i = 0; i < 2; i++) {
+            let block = new WorldObject(new PIXI.Sprite(terrain_sheet['textures']['grass_tile']), this._scene, new Vector2(-250 + i * 32, 180), 0, new Hitbox(32, 32, new Vector2(-250 + i * 32, 180)));
+            block.parent = this._scene;
+        }
+        this._start = Date.now();
+        this._player.onTouch.Connect((...objects) => {
+            let objs = objects[0];
+            for (let obj of objs[0]) {
+                // console.log(obj);
+                if (obj.className == "Rat") {
+                    this._break = true;
+                }
+            }
+        });
+        requestAnimationFrame(this.Update.bind(this));
     }
     Input(deltaTime) {
-        const speed = this._player.getSpeed();
+        const speed = this._player.speed;
+        if (UserInputService.IsKeyDown("ArrowRight") || UserInputService.IsKeyDown("ArrowLeft")) {
+            this._player.frames_since_movement_started++;
+            this._player.walk_cycle += Math.min(Math.abs(this._player.velocity.x) / 3, 2);
+            // console.log(this._player.frames_since_movement_started);
+        }
         if (UserInputService.IsKeyDown("ArrowRight")) {
-            console.log("e");
+            this._player.pixi_object.scale.x = -1;
             this._player.velocity.x += (1 * speed * deltaTime);
         }
         else if (UserInputService.IsKeyDown("ArrowLeft")) {
+            this._player.pixi_object.scale.x = 1;
             this._player.velocity.x += (-1 * speed * deltaTime);
         }
         else {
-            this._player.velocity.x = Math.abs(this._player.velocity.x) * 0.96 * (this._player.velocity.x < 0 ? -1 : 1);
+            this._player.frames_since_movement_started = -1;
+            this._player.velocity.x = Math.abs(this._player.velocity.x) * 0.80 * (this._player.velocity.x < 0 ? -1 : 1);
         }
         if (UserInputService.IsKeyDown("ArrowUp")) {
-            this._player.velocity.y = -1;
+            if (this._player.airtime < 4) {
+                this._player.velocity.y = -10;
+            }
         }
         // console.log(this._player)
     }
     PreRender(deltaTime) {
-        this._player;
+        if (this._player.frames_since_movement_started > 0) {
+            this._player.pixi_object.texture = this._player_sheet.textures[`walk${(Math.floor(this._player.walk_cycle / 4) % 4) + 1}`];
+        }
+        else {
+            if (Math.abs(this._player.velocity.x) > 0.4) {
+                this._player.pixi_object.texture = this._player_sheet.textures['walk2'];
+            }
+            else {
+                this._player.pixi_object.texture = this._player_sheet.textures["stand"];
+            }
+        }
     }
     Physics(deltaTime) {
         // Player movement
+        this._player.airtime++;
+        this._player.velocity.y += 0.5;
+        // console.log(this._player.airtime)
         this._player.moveX(this._player.velocity.x);
+        this._player.moveY(this._player.velocity.y, () => {
+            if (this._player.velocity.y > 0) {
+                this._player.airtime = 0;
+            }
+        });
+        // console.log(this._player.position);
+        if (this._player.position.y > 1000) {
+            this._break = true;
+        }
+        for (let obj of this._scene.getChildren()) {
+            if (obj instanceof Rat) {
+                // console.log(obj.velocity)
+                obj.airtime++;
+                obj.velocity.y += 0.5;
+                obj.moveX(obj.velocity.x);
+                obj.moveY(obj.velocity.y, () => {
+                    if (obj instanceof Rat) {
+                        if (obj.velocity.y > 0) {
+                            obj.airtime = 0;
+                        }
+                    }
+                });
+            }
+        }
     }
-    Update(deltaFrame) {
-        let deltaTime = (deltaFrame / PIXI.Ticker.targetFPMS) / 1000;
+    Render(deltaTime) {
+        this._cam_x = -this._player.position.x + 360;
+        this._cam_y = -this._player.position.y + 240;
+        this._app.renderer.clear();
+        let offset = new PIXI.Matrix();
+        offset.tx = this._cam_x;
+        offset.ty = this._cam_y;
+        for (let obj of this._scene.getChildren()) {
+            if (obj instanceof WorldObject) {
+                this._app.renderer.render(obj.pixi_object, {
+                    "clear": false,
+                    "transform": offset
+                });
+            }
+            else if (obj instanceof Quad) {
+                for (let i = 0; i < obj.getSprites().length; i++) {
+                    let sprite = obj.getSprites()[i];
+                    this._app.renderer.render(sprite, {
+                        "clear": false,
+                        "transform": offset
+                    });
+                }
+            }
+        }
+        this.points_text.text = `${this.points}`;
+        this._app.renderer.render(this.points_text, {
+            clear: false
+        });
+    }
+    Cheese() {
+        if (rand(0, Math.floor(100 / (multiplier() / 2))) == 2) {
+            let pos = new Vector2(rand(-400, 400), rand(80, 300));
+            let cheese = new Cheese(new PIXI.Sprite(this._collectible_sheet['textures']['main']), undefined, pos, 0, new Hitbox(16, 12, pos.x, pos.y));
+            cheese.setHitboxOffset(new Vector2(-16, 0));
+            cheese.parent = this._scene;
+            cheese.world = this._scene;
+        }
+    }
+    Enemy() {
+        if (rand(0, Math.floor(100 / (multiplier() / 2))) == 2) {
+            let rat = new Rat(new PIXI.Sprite(this._enemy_sheet['textures']['main']), undefined, new Vector2(rand(0, 200), 0), 0, new Hitbox(16, 6, 0, 0));
+            rat.setHitboxOffset(new Vector2(-17, -21));
+            rat.onTouch.Connect((...objects) => {
+                let objs = objects[0];
+                for (let obj of objs[0]) {
+                    // console.log(obj);
+                    if (obj instanceof Player) {
+                        this._break = true;
+                    }
+                }
+            });
+            rat.parent = this._scene;
+            rat.world = this._scene;
+            rat.lifetime = 200;
+        }
+        for (let i = 0; i < this._scene.getChildren().length; i++) {
+            let obj = this._scene.getChildren()[i];
+            if (obj instanceof Enemy) {
+                obj.lifetime--;
+                if (obj.lifetime <= 0) {
+                    obj.destroy();
+                    delete this._scene.getChildren()[i];
+                }
+                else {
+                    obj.pathfind(this._player);
+                    if (obj.velocity.x > 0) {
+                        obj.pixi_object.scale.x = -1;
+                    }
+                    else if (obj.velocity.x < 0) {
+                        obj.pixi_object.scale.x = 1;
+                    }
+                }
+            }
+        }
+    }
+    PostPhysics() {
+        for (let obj of this._scene.getTouchingObjects(this._player)) {
+            console.log(obj);
+            if (obj instanceof Collectible) {
+                obj.onCollect(this, this._player);
+            }
+        }
+    }
+    End() {
+        this._app.renderer.clear();
+        this.points_text.style.align = 'center';
+        this.points_text.text = `you lost lol\ncheese stolen: ${this.points_text.text}`;
+        this.points_text.scale.set(1, 1);
+        this.points_text.anchor.set(0.5, 0.5);
+        this.points_text.position.set(360, 240);
+        this._app.renderer.render(this.points_text);
+    }
+    Update() {
+        let current = Date.now();
+        let deltaTime = (current - this._start) / 1000;
         this.Input(deltaTime);
+        this.Enemy();
+        this.Cheese();
         this.Physics(deltaTime);
+        this.PostPhysics();
+        this.PreRender(deltaTime);
+        this.Render(deltaTime);
+        this._start = current;
+        if (this._break == false) {
+            requestAnimationFrame(this.Update.bind(this));
+        }
+        else {
+            this.End();
+        }
     }
 }
 //# sourceMappingURL=Game.js.map
