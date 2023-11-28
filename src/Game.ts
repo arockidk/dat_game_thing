@@ -100,21 +100,21 @@ export class Game {
             path: string,
             load_type: LoadType,
             id: string
-        }[]>('/resources/pre_load.json'), this.Run.bind(this));
+        }[]>('/dat_game_thing/resources/pre_load.json'), this.Run.bind(this));
     }
 
     public async Run(loaded: Map<string,any>): Promise<void> {
         console.log("EE")
         // #region Sprite setup
-        let player_sheet: PIXI.Spritesheet = await PIXI.Assets.load('resources/sprites/Cat.json');
+        let player_sheet: PIXI.Spritesheet = await PIXI.Assets.load('dat_game_thing/resources/sprites/Cat.json');
         await player_sheet.parse();
         this._player_sheet = player_sheet;
-        let terrain_sheet: PIXI.Spritesheet = await PIXI.Assets.load('resources/sprites/TerrainOverworld.json');
+        let terrain_sheet: PIXI.Spritesheet = await PIXI.Assets.load('dat_game_thing/resources/sprites/TerrainOverworld.json');
         await terrain_sheet.parse();
-        let enemy_sheet: PIXI.Spritesheet = await PIXI.Assets.load('resources/sprites/Rat.json');
+        let enemy_sheet: PIXI.Spritesheet = await PIXI.Assets.load('dat_game_thing/resources/sprites/Rat.json');
         await enemy_sheet.parse();
         this._enemy_sheet = enemy_sheet;
-        let collectible_sheet: PIXI.Spritesheet = await PIXI.Assets.load('resources/sprites/Cheese.json');
+        let collectible_sheet: PIXI.Spritesheet = await PIXI.Assets.load('dat_game_thing/resources/sprites/Cheese.json');
         await collectible_sheet.parse();
         this._collectible_sheet = collectible_sheet;
         console.log(player_sheet);
