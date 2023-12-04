@@ -22,5 +22,5 @@ window.onload = () => {
 (globalThis as any).game = game;
 (globalThis as any).__PIXI_STAGE__ = app.stage;
 (globalThis as any).__PIXI_RENDERER__ = app.renderer;
-document.body.appendChild(app.renderer.view as HTMLCanvasElement);
+document.getElementById('game')?.appendChild(app.renderer.view as HTMLCanvasElement);
 game.Init(true);

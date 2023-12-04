@@ -20,7 +20,7 @@ app.get("/*", function(req, res){
         let data = JSON.stringify(fs.readdirSync("./" + req.originalUrl.replaceAll("../","")))
         res.send(data)
     }
-    let send=  __dirname + decodeURIComponent(req.originalUrl)
+    let send=  __dirname + decodeURIComponent(req.originalUrl.split("?")[0])
     // console.log(send);
     res.sendFile(send.replaceAll("../",""));
 })

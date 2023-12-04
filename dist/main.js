@@ -18,6 +18,6 @@ window.onload = () => {
 globalThis.game = game;
 globalThis.__PIXI_STAGE__ = app.stage;
 globalThis.__PIXI_RENDERER__ = app.renderer;
-document.body.appendChild(app.renderer.view);
+document.getElementById('game')?.appendChild(app.renderer.view);
 game.Init(true);
 //# sourceMappingURL=main.js.map

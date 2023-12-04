@@ -8,11 +8,11 @@ import { UserInputService } from "./UserInputService.js";
 import { Vector2 } from "./Vector2.js";
 import { World } from "./World.js";
 import { WorldObject } from "./WorldObject.js";
-import { float } from "./typedef.js";
+import { float, int } from "./typedef.js";
 import { rand } from "./Random.js";
 import Collectible from "./Collectible.js";
 import Cheese from "./Cheese.js";
-import { multiplier } from "./expfn.js";
+import { multiplier, passed } from "./expfn.js";
 enum LoadType {
     JSON = "JSON",
     IMAGE = "IMAGE",
@@ -36,6 +36,7 @@ export class Game {
     private _collectible_sheet!: PIXI.Spritesheet;
     private points_text: PIXI.Text;
     private _break: boolean = false;
+    private frames_since_start: int = 0;
     public  points: number;
     constructor(app: App) {
         this._app = app;
@@ -121,11 +122,11 @@ export class Game {
         let player = new Player(
             new PIXI.Sprite(player_sheet['textures']['stand']),
             this._scene,
-            new Vector2(0,0), 
+            new Vector2(60,170), 
             0,
             new Hitbox(
                 24,40,
-                new Vector2(0,0)
+                new Vector2(60,170)
             )
             
         );
@@ -199,6 +200,70 @@ export class Game {
             block.parent = this._scene;
             
         }
+        for (let i = 0; i < 7; i++) {
+            let block: WorldObject = new WorldObject(
+                new PIXI.Sprite(terrain_sheet['textures']['grass_tile']),
+                this._scene,
+                new Vector2(-100 + i * 32,320), 
+                0,
+                new Hitbox(
+                    32,
+                    32, 
+                    new Vector2(-100 + i * 32,320)
+                )
+    
+            )
+            block.parent = this._scene;
+            
+        }
+        for (let i = 0; i < 7; i++) {
+            let block: WorldObject = new WorldObject(
+                new PIXI.Sprite(terrain_sheet['textures']['grass_tile']),
+                this._scene,
+                new Vector2(200 + i * 32,350), 
+                0,
+                new Hitbox(
+                    32,
+                    32, 
+                    new Vector2(200 + i * 32,350)
+                )
+    
+            )
+            block.parent = this._scene;
+            
+        }
+        for (let i = 0; i < 7; i++) {
+            let block: WorldObject = new WorldObject(
+                new PIXI.Sprite(terrain_sheet['textures']['grass_tile']),
+                this._scene,
+                new Vector2(500 + i * 32,220), 
+                0,
+                new Hitbox(
+                    32,
+                    32, 
+                    new Vector2(500 + i * 32,220)
+                )
+    
+            )
+            block.parent = this._scene;
+            
+        }
+        for (let i = 0; i < 7; i++) {
+            let block: WorldObject = new WorldObject(
+                new PIXI.Sprite(terrain_sheet['textures']['grass_tile']),
+                this._scene,
+                new Vector2(500 + i * 32,298), 
+                0,
+                new Hitbox(
+                    32,
+                    32, 
+                    new Vector2(500 + i * 32,298)
+                )
+    
+            )
+            block.parent = this._scene;
+            
+        }
         for (let i = 0; i < 2; i++) {
             let block: WorldObject = new WorldObject(
                 new PIXI.Sprite(terrain_sheet['textures']['grass_tile']),
@@ -250,7 +315,7 @@ export class Game {
         const speed = this._player.speed;
         if (UserInputService.IsKeyDown("ArrowRight") || UserInputService.IsKeyDown("ArrowLeft")) {
             this._player.frames_since_movement_started++;
-            this._player.walk_cycle += Math.min(Math.abs(this._player.velocity.x)/3,2);
+            this._player.walk_cycle += Math.min(Math.abs(this._player.velocity.x)/3,2) * deltaTime * 50;
             // console.log(this._player.frames_since_movement_started);
         }
         if (UserInputService.IsKeyDown("ArrowRight")) {
@@ -265,8 +330,12 @@ export class Game {
             this._player.velocity.x = Math.abs(this._player.velocity.x) * 0.80 *(this._player.velocity.x < 0 ? -1 : 1);
         }
         if (UserInputService.IsKeyDown("ArrowUp")) {
-            if (this._player.airtime < 4) {
-                this._player.velocity.y = -10;
+            if (this._player.airtime < 6) {
+                this._player.velocity.y = -8;
+                if (this._player.airtime < 2) { 
+                    this._player.velocity.x *= 1.03;
+                }
+                
             }
             
         }
@@ -297,7 +366,11 @@ export class Game {
         this._player.moveY(this._player.velocity.y,()=>{
             if (this._player.velocity.y > 0) {
                 this._player.airtime = 0;
+                if (UserInputService.IsKeyDown("ArrowUp")) {
+                    this._player.velocity.x *= 0.95;
+                }
             }
+
         
         });
         // console.log(this._player.position);
@@ -365,8 +438,10 @@ export class Game {
 
     }
     private Cheese() {
-        if (rand(0,Math.floor(100 / (multiplier() / 2))) == 2) {
-            let pos = new Vector2(rand(-400,400), rand(80,300))
+        
+        console.log(Math.floor(70 / (multiplier() / 2)), multiplier() / 2);
+        if (this.frames_since_start % Math.floor(70 / (multiplier() / 2)) == 0) {
+            let pos = new Vector2(rand(-400,800), rand(80,300))
             let cheese = new Cheese(
                 new PIXI.Sprite(this._collectible_sheet['textures']['main']),
                 undefined,
@@ -375,8 +450,8 @@ export class Game {
                 new Hitbox(
                     16,
                     12,
-                    pos.x,
-                    pos.y
+                    pos.x - 16,
+                    pos.y - 3
                 )
             )
             cheese.setHitboxOffset(
@@ -387,7 +462,7 @@ export class Game {
         }
     }
     private Enemy() {
-        if (rand(0,Math.floor(100 / (multiplier() / 2))) == 2) {
+        if (this.frames_since_start % Math.floor(70 / (multiplier() / 2)) == 0) {
             let rat = new Rat(
                 new PIXI.Sprite(this._enemy_sheet['textures']['main']),
                 undefined,
@@ -417,7 +492,7 @@ export class Game {
             })
             rat.parent = this._scene;
             rat.world = this._scene;
-            rat.lifetime = 200
+            rat.lifetime = 400
             
         }
         for (let i = 0; i < this._scene.getChildren().length; i++) {
@@ -455,8 +530,21 @@ export class Game {
     private End() {
         this._app.renderer.clear();
         this.points_text.style.align = 'center';
+        let high_score = localStorage.getItem('high_score');
+        if (!high_score) {
+            high_score = this.points.toString();
+            this.points_text.text = `You lost!\nCheese stolen: ${this.points_text.text}\nNew high score!`;
+        } else {
+            if (this.points > Number(high_score)) {
+                this.points_text.text = `You lost!\nCheese stolen: ${this.points_text.text}\nNew high score!`;
+                high_score = this.points.toString();
+            } else {
+                this.points_text.text = `You lost!\nCheese stolen: ${this.points_text.text}\nHigh score: ${high_score}.`;
+            }
+        }
+
+        localStorage.setItem("high_score", high_score);
         
-        this.points_text.text = `you lost lol\ncheese stolen: ${this.points_text.text}`;
         this.points_text.scale.set(1,1);
         this.points_text.anchor.set(0.5,0.5)
         this.points_text.position.set(360,240) ;
@@ -476,6 +564,7 @@ export class Game {
         this.Render(deltaTime);
 
         this._start = current;
+        this.frames_since_start++;
         if (this._break == false) {
             requestAnimationFrame(this.Update.bind(this));
         } else {

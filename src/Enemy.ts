@@ -17,7 +17,7 @@ export default class Enemy extends Actor implements Jumpable {
         }
         if (dir.y < -40) {
             if (rand(0,20) == 0 && this.airtime < 2) {
-                this.velocity.y = -6;
+                this.velocity.y = -4 * (1 + (multiplier() / 4));
                 
             }
         }

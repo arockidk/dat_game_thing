@@ -1,10 +1,49 @@
-<style>
-    body { 
-        overflow-x: hidden;
-    }
-</style>
-<script> 
-
-</script>
-<script src="/dat_game_thing/dist/main.js" type="module"></script>
-<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        body { 
+            overflow-x: hidden;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        #instructions {
+            display: inline-block;
+            position: relative;
+        }
+    </style>
+    <script> 
+    
+    </script>
+    <!-- <script src="main.js" type="module"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+</head>
+<body>
+    <script>
+        function create() {
+            let script = document.createElement("script");
+            script.src = "main.js";
+            script.type = "module";
+            document.body.appendChild(script);
+        }
+        let params = new URLSearchParams(this.location.search)
+        function start() {
+            document.getElementById("start")?.remove();
+            create();
+        }
+        
+    </script>
+    <div id="game"></div>
+    <div id="instructions">
+        <h2>Instructions</h2>
+        <p>
+            Steal as much cheese as possible without touching the rats, or falling off of the platforms.
+        </p>
+        <button id="start" onclick="start()">Start</button>
+        
+    </div>
+    
+</body>
+</html>
